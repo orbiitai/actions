@@ -1,3 +1,7 @@
+name: Update scoped dependencies
+author: Orbiit
+description: Update your scoped dependencies in a Yarn project
+
 inputs:
   dependencies-scope:
     description: The name of the dependencies scope
@@ -12,6 +16,6 @@ inputs:
 runs:
   using: composite
   steps:
-    - run: ${{ github.action_path }}/dependencies-update.sh "${{ inputs.dependencies-scope }}" "${{ inputs.git-commit-message }}" "${{ inputs.git-commit-branch }}"
+    - run: ${{ github.action_path }}/dependencies-update.sh ${{ inputs.dependencies-scope }} \"${{ inputs.git-commit-message }}\" ${{ inputs.git-commit-branch }}
       shell: bash
 
