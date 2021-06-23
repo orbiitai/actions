@@ -1,0 +1,17 @@
+inputs:
+  dependencies-scope:
+    description: The name of the dependencies scope
+    default: ${{ github.repository_owner }}
+  git-commit-message:
+    description: The commit message to use
+    default: chore(deps): Update dependencies
+  git-commit-branch:
+    description: The branch to commit to
+    default: actions/dependencies-update
+
+runs:
+  using: composite
+  steps:
+    - run: ${{ github.action_path }}/dependencies-update.sh "${{ inputs.dependencies-scope }}" "${{ inputs.git-commit-message }}" "${{ inputs.git-commit-branch }}"
+      shell: bash
+
