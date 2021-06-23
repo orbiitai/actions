@@ -8,7 +8,7 @@ inputs:
     default: ${{ github.repository_owner }}
   git-commit-message:
     description: The commit message to use
-    default: chore(deps): Update dependencies
+    default: 'chore(deps): Update dependencies'
   git-commit-branch:
     description: The branch to commit to
     default: actions/dependencies-update
