@@ -12,7 +12,7 @@ yarn audit
 
 if git diff-index --quiet HEAD 2>&1; then
   echo "No changes... Bye!"
-  exit
+  exit 0
 fi
 
 # Create a branch on which to commit the changes using the "actions" namespace
