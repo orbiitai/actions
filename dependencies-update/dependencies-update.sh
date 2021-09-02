@@ -7,10 +7,7 @@ GIT_COMMIT_BRANCH=$3
 # Check for updates to @orbiitai dependencies
 yarn upgrade --scope "$DEPENDENCIES_SCOPE" --latest
 
-# Run an audit on the new/existing dependencies
-yarn audit
-
-if git diff-index --quiet HEAD 2>&1; then
+if git diff --quiet --exit-code 2>&1; then
   echo "No changes... Bye!"
   exit 0
 fi
