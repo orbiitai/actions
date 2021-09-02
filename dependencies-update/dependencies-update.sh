@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh
 
 DEPENDENCIES_SCOPE=$1
 GIT_COMMIT_MESSAGE=$2
@@ -29,10 +29,13 @@ if ! command -v gh 2>&1 /dev/null; then
   exit
 fi
 
-# Create a PR from this branch (in the event that there is already a PR open
-# against this branch, this command should exit gracefully).
+# Create a PR from this branch.
 gh pr create \
   --title "$GIT_COMMIT_MESSAGE" \
   --body "This is an automated dependency update, review me!" \
   --label dependencies
+
+# `gh pr create` now sets its exit code according to the outcome of the action,
+# so we'll set the exit code explictly here to avoid misleading failures.
+exit 0
 
