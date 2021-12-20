@@ -1,0 +1,38 @@
+name: 'Build and Push Docker Image'
+description: 'Build a Docker image and push it to a Google Artifact Registry'
+
+inputs:
+  gcs-secret:
+    description: 'GCS secret to be used for authentication' 
+    required: true
+  gcs-project-id:
+    description: 'ID of the relevant GCS project'
+    required: true
+  gcs-zone:
+    description: 'The zone the Google Artifact Repository is on'
+    required: true
+  artifact-repository-name:
+    description: 'The artifact repository name'
+    required: true
+  image-name:
+    description: 'The image name in the artifact repository'
+    required: true
+  version-number:
+    description: 'The version number to push'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: google-github-actions/setup-gcloud@master
+      with:
+        project_id: ${{ inputs.gcs-project-id }}
+        service_account_key: ${{ inputs.gcs-secret }}
+        export_default_credentials: true
+    - name: "Build and push image."
+      run: |-
+        gcloud auth configure-docker ${{ inputs.gcs-zone }}-docker.pkg.dev
+        docker buildx build --platform linux/amd64 -t ${{ inputs.gcs-zone }}-docker.pkg.dev/${{ inputs.gcs-project-id }}/${{ inputs.artifact-repository-name }}/${{ inputs.image-name }}:${{ inputs.version-number }} -t ${{ inputs.gcs-zone }}-docker.pkg.dev/${{ inputs.gcs-project-id }}/${{ inputs.artifact-repository-name }}/${{ inputs.image-name }}:latest .
+        docker push ${{ inputs.gcs-zone }}-docker.pkg.dev/${{ inputs.gcs-project-id }}/${{ inputs.artifact-repository-name }}/${{ inputs.image-name }}:${{ inputs.version-number }}
+        docker push ${{ inputs.gcs-zone }}-docker.pkg.dev/${{ inputs.gcs-project-id }}/${{ inputs.artifact-repository-name }}/${{ inputs.image-name }}:latest
+      shell: bash
