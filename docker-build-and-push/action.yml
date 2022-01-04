@@ -31,9 +31,11 @@ runs:
         export_default_credentials: true
 
     - name: "Create image name"
+      shell: bash
       run: echo "image_name='${{ inputs.gcs-zone }}-docker.pkg.dev/${{ inputs.gcs-project-id }}/${{ inputs.artifact-repository-name }}/${{ inputs.image-name }}'" >> $GITHUB_ENV
     
     - name: "Build and push image."
+      shell: bash
       run: |-
         gcloud auth configure-docker ${{ inputs.gcs-zone }}-docker.pkg.dev
         docker build -t ${{ env.image_name }}:${{ inputs.version-number }} -t ${{ env.release_name }}:lates --build-arg GITHUB_TOKEN .
