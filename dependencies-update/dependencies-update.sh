@@ -4,8 +4,8 @@ DEPENDENCIES_SCOPE=$1
 GIT_COMMIT_MESSAGE=$2
 GIT_COMMIT_BRANCH=$3
 
-# Check for updates to @orbiitai dependencies
-yarn upgrade --scope "$DEPENDENCIES_SCOPE" --latest
+# Check for updates in the scoped dependencies
+yarn upgrade --scope "$DEPENDENCIES_SCOPE"
 
 if git diff --quiet --exit-code 2>&1; then
   echo "No changes... Bye!"
