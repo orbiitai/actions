@@ -2,9 +2,6 @@ name: 'Build and Push Docker Image'
 description: 'Build a Docker image and push it to a Google Artifact Registry'
 
 inputs:
-  gcs-secret:
-    description: 'GCS secret to be used for authentication' 
-    required: true
   gcs-project-id:
     description: 'ID of the relevant GCS project'
     required: true
@@ -20,14 +17,17 @@ inputs:
   version-number:
     description: 'The version number to push'
     required: true
+  project-dir:
+    description: 'path to project dir'
+    required: true
+    default: '.'
 
 runs:
   using: composite
   steps:
-    - uses: google-github-actions/setup-gcloud@master
+    - uses: google-github-actions/setup-gcloud@v0
       with:
         project_id: ${{ inputs.gcs-project-id }}
-        service_account_key: ${{ inputs.gcs-secret }}
         export_default_credentials: true
 
     - name: "Create image name"
@@ -36,8 +36,9 @@ runs:
     
     - name: "Build and push image."
       shell: bash
+      working-directory: ${{ inputs.project-dir }}
       run: |-
         gcloud auth configure-docker ${{ inputs.gcs-zone }}-docker.pkg.dev
-        docker build -t ${{ env.image_name }}:${{ inputs.version-number }} -t ${{ env.release_name }}:lates --build-arg GITHUB_TOKEN .
+        docker build -t ${{ env.image_name }}:${{ inputs.version-number }} -t ${{ env.release_name }}:latest --build-arg GITHUB_TOKEN .
         docker push -a ${{ env.image_name }}
 
