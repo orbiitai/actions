@@ -21,6 +21,10 @@ inputs:
     description: 'path to project dir'
     required: true
     default: '.'
+  build-args:
+    description: 'Build arguments to pass to docker. Should be formatted as --build-arg <key1>=<value1> --build-arg <key2>=<value2>'
+    required: false
+    default: ''
 
 runs:
   using: composite
@@ -30,19 +34,25 @@ runs:
         project_id: ${{ inputs.gcs-project-id }}
         export_default_credentials: true
 
-    - name: "Create image name"
+    - id: docker-url
+      name: "Create Docker URL"
       shell: bash
-      run: echo "image_name='${{ inputs.gcs-zone }}-docker.pkg.dev/${{ inputs.gcs-project-id }}/${{ inputs.artifact-repository-name }}/${{ inputs.image-name }}'" >> $GITHUB_ENV
+      run: echo "docker_url='${{ inputs.gcs-zone }}-docker.pkg.dev'" >> $GITHUB_ENV
+
+    - id: image-name
+      name: "Create image name"
+      shell: bash
+      run: echo "image_name='${{ env.docker_url }}/${{ inputs.gcs-project-id }}/${{ inputs.artifact-repository-name }}/${{ inputs.image-name }}'" >> $GITHUB_ENV
     
     - name: "Build and push image."
       shell: bash
       working-directory: ${{ inputs.project-dir }}
       run: |-
-        gcloud auth configure-docker ${{ inputs.gcs-zone }}-docker.pkg.dev
+        gcloud auth configure-docker ${{ env.docker_url }}
         docker buildx build \
           --platform linux/amd64 \
           --tag ${{ env.image_name }}:${{ inputs.version-number }} \
           --tag ${{ env.image_name }}:latest \
-          --build-arg GITHUB_TOKEN .
+          ${{ inputs.build-args }} .
         docker push -a ${{ env.image_name }}
 
