@@ -39,6 +39,10 @@ runs:
       working-directory: ${{ inputs.project-dir }}
       run: |-
         gcloud auth configure-docker ${{ inputs.gcs-zone }}-docker.pkg.dev
-        docker build -t ${{ env.image_name }}:${{ inputs.version-number }} -t ${{ env.release_name }}:latest --build-arg GITHUB_TOKEN .
+        docker buildx build \
+          --platform linux/amd64 \
+          --tag ${{ env.image_name }}:${{ inputs.version-number }} \
+          --tag ${{ env.image_name }}:latest \
+          --build-arg GITHUB_TOKEN .
         docker push -a ${{ env.image_name }}
 
