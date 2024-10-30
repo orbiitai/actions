@@ -2,10 +2,10 @@ name: 'Build and Push Docker Image'
 description: 'Build a Docker image and push it to a Google Artifact Registry'
 
 inputs:
-  gcs-project-id:
+  gcp-project-id:
     description: 'ID of the relevant GCS project'
     required: true
-  gcs-zone:
+  gcp-zone:
     description: 'The zone the Google Artifact Repository is on'
     required: true
   artifact-repository-name:
@@ -29,21 +29,21 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: google-github-actions/setup-gcloud@v0
+    - uses: google-github-actions/setup-gcloud@v2
       with:
-        project_id: ${{ inputs.gcs-project-id }}
+        project_id: ${{ inputs.gcp-project-id }}
         export_default_credentials: true
 
     - id: docker-url
       name: "Create Docker URL"
       shell: bash
-      run: echo "docker_url='${{ inputs.gcs-zone }}-docker.pkg.dev'" >> $GITHUB_ENV
+      run: echo "docker_url='${{ inputs.gcp-zone }}-docker.pkg.dev'" >> $GITHUB_ENV
 
     - id: image-name
       name: "Create image name"
       shell: bash
-      run: echo "image_name='${{ env.docker_url }}/${{ inputs.gcs-project-id }}/${{ inputs.artifact-repository-name }}/${{ inputs.image-name }}'" >> $GITHUB_ENV
-    
+      run: echo "image_name=${{ env.docker_url }}/${{ inputs.gcp-project-id }}/${{ inputs.artifact-repository-name }}/${{ inputs.image-name }}" >> $GITHUB_ENV
+
     - name: "Build and push image."
       shell: bash
       working-directory: ${{ inputs.project-dir }}
